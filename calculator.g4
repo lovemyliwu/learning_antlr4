@@ -1,9 +1,30 @@
 grammar calculator; // rename to distinguish from Expr.g4
 
+// 内嵌代码 注意python的indent
+@parser::members {
+# 新增属性
+@property
+def print_times(self):
+    return self._col
+
+# 属性的setter
+@print_times.setter
+def print_times(self, value):
+    self._col = value
+}
+
 prog:   stat+ ;
 
-stat:   expr NEWLINE                # printExpr
-    |   ID '=' expr NEWLINE         # assign
+stat
+    locals [i = 0]
+    :   expr NEWLINE                # printExpr
+    |   ID '=' expr NEWLINE
+{
+if self.print_times:
+    self.print_times = self.print_times - 1
+    print(f'第{$i}次出现赋值语句,只提示{self.print_times}次')
+}
+    # assign
     |   NEWLINE                     # blank
     |   CLEAR NEWLINE               # clear
     ;

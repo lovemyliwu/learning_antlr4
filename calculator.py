@@ -66,17 +66,14 @@ class VerboseListener(ErrorListener) :
 
 if __name__ == '__main__':
     input_stream = InputStream(sys.stdin.readline())
-
     lexer = calculatorLexer(input_stream)
     token_stream = CommonTokenStream(lexer)
+
     parser = calculatorParser(token_stream)
+    parser.print_times = 2
     parser.removeErrorListeners()
     parser.addErrorListener(VerboseListener())
-    print('generate ast')
     tree = parser.prog()
-    #lisp_tree_str = tree.toStringTree(recog=parser)
-    #print(lisp_tree_str)
-    print('success generate ast')
 
     visitor = MyVisitor()
     print('vistor value:', visitor.visit(tree))
