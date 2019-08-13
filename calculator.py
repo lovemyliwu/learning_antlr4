@@ -11,16 +11,22 @@ class MyVisitor(calculatorVisitor):
     def __init__(self):
         self.memory = {}
 
+    def visitClear(self, ctx):
+        print('flush memory!')
+        self.memory = {}
+        return 0
+
     def visitAssign(self, ctx):
         name = ctx.ID().getText()
         value = self.visit(ctx.expr())
         self.memory[name] = value
+        print(f'keep variable {name}={value}')
         return value
 
     def visitPrintExpr(self, ctx):
         value = self.visit(ctx.expr())
-        print(value)
-        return 0
+        print(f'{ctx.expr().getText()}={value}')
+        return value
 
     def visitInt(self, ctx):
         return ctx.INT().getText()
@@ -29,6 +35,7 @@ class MyVisitor(calculatorVisitor):
         name = ctx.ID().getText()
         if name in self.memory:
             return self.memory[name]
+        print(f'no variable {name} found, use default value 0')
         return 0
 
     def visitMulDiv(self, ctx):
