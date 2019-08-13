@@ -1,5 +1,7 @@
 import sys
 
+from antlr4.error.ErrorListener import ErrorListener
+
 from gen.calculatorLexer import calculatorLexer, CommonTokenStream
 from gen.calculatorVisitor import calculatorVisitor
 from gen.calculatorParser import calculatorParser, InputStream
@@ -47,16 +49,27 @@ class MyVisitor(calculatorVisitor):
         return self.visit(ctx.expr())
 
 
+class VerboseListener(ErrorListener) :
+    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+        stack = recognizer.getRuleInvocationStack()
+        stack.reverse()
+        print("rule stack: ", str(stack))
+        raise SyntaxError(f'line {line} : {column} at {offendingSymbol} : {msg}')
+
+
 if __name__ == '__main__':
     input_stream = InputStream(sys.stdin.readline())
 
     lexer = calculatorLexer(input_stream)
     token_stream = CommonTokenStream(lexer)
     parser = calculatorParser(token_stream)
+    parser.removeErrorListeners()
+    parser.addErrorListener(VerboseListener())
+    print('generate ast')
     tree = parser.prog()
-
     #lisp_tree_str = tree.toStringTree(recog=parser)
     #print(lisp_tree_str)
+    print('success generate ast')
 
     visitor = MyVisitor()
     print('vistor value:', visitor.visit(tree))
