@@ -82,6 +82,8 @@ if __name__ == '__main__':
     parser.removeErrorListeners()
     parser.addErrorListener(VerboseListener())
     tree = parser.prog()
+    for stat in tree.children:
+       print(stat.result)
 
     visitor = MyVisitor()
     print('vistor value:', visitor.visit(tree))
