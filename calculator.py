@@ -103,8 +103,9 @@ if __name__ == '__main__':
     parser._errHandler = ErrorHandler()
 
     tree = parser.prog()
+    print('tree result:',tree.result)
     for stat in tree.children:
-       print(stat.result)
+       print(f'stat<{stat.getText()}> result:', stat.result)
 
     visitor = MyVisitor()
     print('vistor value:', visitor.visit(tree))

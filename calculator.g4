@@ -38,8 +38,8 @@ def print_times(self, value):
 prog
     returns [result]
     :
-    stat+
-{$result = 1}
+    stats+=stat+
+{$result = ','.join([str(x.result) for x in $stats])}
     ;
 
 stat
