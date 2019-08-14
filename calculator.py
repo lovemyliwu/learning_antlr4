@@ -45,6 +45,14 @@ class MyVisitor(calculatorVisitor):
             return left * right
         return left / right
 
+    def visitDMul(self, ctx):
+        left = int(self.visit(ctx.expr(0)))
+        right = int(self.visit(ctx.expr(1)))
+        if ctx.op.type != calculatorParser.DMUL:
+            raise Exception('error operator')
+        return left**right
+
+
     def visitAddSub(self, ctx):
         left = int(self.visit(ctx.expr(0)))
         right = int(self.visit(ctx.expr(1)))

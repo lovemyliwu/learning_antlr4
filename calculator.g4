@@ -30,7 +30,8 @@ if self.print_times:
     ;
 
 // 优先级控制
-expr:   expr op=('*'|'/') expr      # MulDiv
+expr:   <assoc=right> expr op='^' expr  #DMul
+    |   expr op=('*'|'/') expr      # MulDiv
     |   expr op=('+'|'-') expr      # AddSub
     |   INT                         # int
     |   ID                          # id
@@ -38,6 +39,7 @@ expr:   expr op=('*'|'/') expr      # MulDiv
     ;
 
 CLEAR : '###'  ;
+DMUL:   '^';
 MUL :   '*' ; // assigns token name to '*' used above in grammar
 DIV :   '/' ;
 ADD :   '+' ;
