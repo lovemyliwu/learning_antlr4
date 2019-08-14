@@ -1,6 +1,8 @@
 import sys
 
 from antlr4.error.ErrorListener import ErrorListener
+from antlr4.error.ErrorStrategy import DefaultErrorStrategy
+from antlr4.error.Errors import InputMismatchException
 
 from gen.calculatorLexer import calculatorLexer, CommonTokenStream
 from gen.calculatorVisitor import calculatorVisitor
@@ -64,12 +66,29 @@ class MyVisitor(calculatorVisitor):
         return self.visit(ctx.expr())
 
 
+# 收集所有的语法错误信息
+# 可以综合判断
 class VerboseListener(ErrorListener) :
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
         stack = recognizer.getRuleInvocationStack()
         stack.reverse()
         print("rule stack: ", str(stack))
-        raise SyntaxError(f'line {line} : {column} at {offendingSymbol} : {msg}')
+        print(f'line {line} : {column} at {offendingSymbol} : {msg}')
+
+
+#  直接报语法异常
+class ErrorHandler(DefaultErrorStrategy):
+    def sync(self, recognizer):
+        pass
+
+    def recoverInline(self, recognizer):
+        raise InputMismatchException(recognizer)
+
+    def recover(self, recognizer, e):
+        raise e
+
+    def reportNoViableAlternative(self, recognizer, e):
+        recognizer.notifyErrorListeners("缺少备选条件", e.offendingToken, e)
 
 
 if __name__ == '__main__':
@@ -81,6 +100,8 @@ if __name__ == '__main__':
     parser.print_times = 2
     parser.removeErrorListeners()
     parser.addErrorListener(VerboseListener())
+    parser._errHandler = ErrorHandler()
+
     tree = parser.prog()
     for stat in tree.children:
        print(stat.result)
